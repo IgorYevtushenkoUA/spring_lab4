@@ -1,6 +1,6 @@
 create table if not exists books
 (
-    id   int4 ,
+    id   integer ,
     name varchar(255),
     primary key(id)
 
@@ -19,7 +19,8 @@ create table if not exists book_has_genres
     genre_id integer not null,
     CONSTRAINT fk_book
         FOREIGN KEY (book_id)
-            references books (id),
-    CONSTRAINT fk_genre foreign key (genre_id)
-        references genres (id)
+            references books (id) ON DELETE CASCADE,
+    CONSTRAINT fk_genre
+        foreign key (genre_id)
+            references genres (id) ON DELETE CASCADE
 );

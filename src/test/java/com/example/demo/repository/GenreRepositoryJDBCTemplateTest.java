@@ -18,10 +18,11 @@ import java.util.List;
 public class GenreRepositoryJDBCTemplateTest extends Postgres {
 
     private static final String INSERT_SQL = "insert into genres(id,name) values (?,?)";
-    private static final String DELETE_BY_NAME_SQL = "delete from genres where name = ? RETURNING *";
-    private static final String DELETE_BY_NAME_SQL2 = "delete from genres where name = ? ";
+    private static final String DELETE_BY_ID_SQL = "delete from genres where id = ? ";
+    private static final String DELETE_BY_NAME_SQL = "delete from genres where name = ? ";
     private static final String UPDATE_SQL = "update genres set name = ? where id = ?";
     private static final String SELECT_ALL_SQL = "select * from genres ";
+    private static final String SELECT_BY_ID_SQL = "select * from genres g where g.id = ?";
 
     class GenreRowMapper implements RowMapper<Genre> {
 
@@ -40,48 +41,46 @@ public class GenreRepositoryJDBCTemplateTest extends Postgres {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    private final String defaultName = "Comedy";
-    private final int defaultId = 1;
-
     @BeforeEach
     void initializeBD() {
-        jdbcOperations.update(INSERT_SQL, defaultId, defaultName);
+        List<Genre> genres = getAllGenres();
+        if (genres.size() == 0) {
+            jdbcOperations.update(INSERT_SQL, 1, "genre1");
+            jdbcOperations.update(INSERT_SQL, 2, "genre2");
+            jdbcOperations.update(INSERT_SQL, 3, "genre3");
+        }
     }
 
     @AfterEach
     void deleteDB() {
-        List<Genre> result = jdbcOperations.query(DELETE_BY_NAME_SQL,
-                (rs, rowNum) -> Genre.builder()
-                        .id(rs.getInt("id"))
-                        .name(rs.getString("name"))
-                        .build(),
-                defaultName);
-    }
-
-    @Test
-    void testInsert() {
-
-        List<Genre> genres = getAllGenres();
-
-        Assert.assertEquals(1, genres.size());
-    }
-
-
-    @Test
-    void testUpdate() {
-        jdbcTemplate.update(UPDATE_SQL,
-                "defaultNewGenreName", defaultId);
-        List<Genre> genres = getAllGenres();
-
-        Assert.assertEquals("defaultNewGenreName", genres.get(0).getName());
-    }
-
-
-    @Test
-    void testDelete() {
         List<Genre> genres = getAllGenres();
         for (Genre g : genres)
-            jdbcTemplate.update(DELETE_BY_NAME_SQL2, g.getName());
+            jdbcTemplate.update(DELETE_BY_ID_SQL, g.getId());
+    }
+
+    @Test
+    void should_return_correct_size() {
+
+        List<Genre> genres = getAllGenres();
+        Assert.assertEquals(3, genres.size());
+    }
+
+
+    @Test
+    void should_return_updated_genre() {
+        jdbcTemplate.update(UPDATE_SQL,
+                "defaultNewGenreName", 1);
+        Genre genre = findById(1);
+
+        Assert.assertEquals("defaultNewGenreName", genre.getName());
+    }
+
+
+    @Test
+    void delete_all_genres() {
+        List<Genre> genres = getAllGenres();
+        for (Genre g : genres)
+            jdbcTemplate.update(DELETE_BY_NAME_SQL, g.getName());
         Assert.assertEquals(0, getAllGenres().size());
     }
 
@@ -89,6 +88,10 @@ public class GenreRepositoryJDBCTemplateTest extends Postgres {
         return jdbcTemplate.query(
                 SELECT_ALL_SQL,
                 new GenreRowMapper());
+    }
+
+    private Genre findById(int id) {
+        return jdbcTemplate.queryForObject(SELECT_BY_ID_SQL, new Object[]{id}, new GenreRowMapper());
     }
 
 }

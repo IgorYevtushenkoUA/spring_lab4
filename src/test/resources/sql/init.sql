@@ -1,0 +1,13 @@
+-- create table if not exists books(
+--     id   integer primary key ,
+--     name varchar(255),
+--     page_number INTEGER NOT NULL,
+--     description VARCHAR(1024) NOT NULL ,
+--     publisher   VARCHAR(1024) NOT NULL ,
+--     price   DOUBLE PRECISION;
+-- );
+--
+-- insert into books(name, page_number, description, publisher, price)
+-- values ('name1', 500, 'book about...', 'author1', 100),
+--        ('name2', 240, 'book about...', 'author2', 120),
+--        ('name3', 324, 'book about...', 'author3', 150);

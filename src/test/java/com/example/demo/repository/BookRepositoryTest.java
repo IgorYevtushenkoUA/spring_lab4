@@ -3,8 +3,6 @@ package com.example.demo.repository;
 import com.example.demo.entity.Book;
 import com.example.demo.initializer.Postgres;
 import org.junit.Assert;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,50 +13,28 @@ public class BookRepositoryTest extends Postgres {
     @Autowired
     protected BookRepository bookRepository;
 
-    protected void createBook(String name, String description, int pageNum, String publisher, double price) {
-        Book newBook = Book.builder()
-                .name(name)
-                .description(description)
-                .pageNumber(pageNum)
-                .publisher(publisher)
-                .price(price)
-                .build();
-
-        bookRepository.save(newBook);
-    }
-
-    @BeforeEach
-    public void initializeBD() {
-        createBook("name1", "description", 100, "publisher", 1.0);
-    }
-
-    @AfterEach
-    public void deleteDB() {
-        bookRepository.deleteAll();
-    }
-
     @Test
-    void contextLoads() {
+    void should_return_correct_size() {
         List<Book> books = bookRepository.findAll();
-        Assert.assertEquals(books.size(), 1);
+        Assert.assertEquals(books.size(), 3);
     }
 
     @Test
-    void nameSearching() {
+    void should_return_correct_size_when_not_found_book_by_name() {
         String defaultName = "defaultName";
         List<Book> books = bookRepository.findAllByName(defaultName);
         Assert.assertEquals(0, books.size());
     }
 
     @Test
-    void getBookByIdNotNull() {
+    void should_return_null_NOT_NULL_when_book_exists_by_id() {
         int defaultId = 1;
         Book book = bookRepository.findById(defaultId).orElse(null);
         Assert.assertNotNull(book);
     }
 
     @Test
-    void getBookByIdNull() {
+    void should_return_null_NULL_when_book_exists_by_id() {
         int defaultId = 0;
         Book book = bookRepository.findById(defaultId).orElse(null);
         Assert.assertNull(book);
