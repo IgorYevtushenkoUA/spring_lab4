@@ -16,7 +16,6 @@ public class DemoApplication {
 
     public static void test(ApplicationContext applicationContext) {
         BookService bookService = applicationContext.getBean(BookService.class);
-        System.out.println(bookService.getBooks());
 
     }
 
