@@ -85,4 +85,5 @@ public class TransactionalTest {
         Book book = em.find(Book.class, 1);
         Assert.assertEquals(777.0, book.getPrice(), 0);
     }
+
 }
